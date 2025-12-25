@@ -1,85 +1,98 @@
 """
-Script de test pour valider le scraping Indeed des offres d'emploi en France
-Supporte plusieurs termes de recherche : data analyst, python, IA, alternance, etc.
-Le filtrage par localisation sera effectue par le chatbot dans les requetes
+Script de test pour valider le scraping Indeed avec Selenium
+Contourne les protections JavaScript d'Indeed
 """
-from langchain_community.document_loaders import WebBaseLoader
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-import requests
+import time
 
 def test_scraping(query=""):
     """
-    Test du scraping des offres d'emploi Indeed France
+    Test du scraping des offres d'emploi Indeed France avec Selenium
 
     Args:
-        query: Terme de recherche (ex: 'data analyst', 'python', 'alternance', ou '' pour toutes les offres)
+        query: Terme de recherche (ex: 'data analyst', 'python', 'alternance')
     """
 
-    # Construction de l'URL - TOUTE LA FRANCE (pas de filtre localisation)
+    # Construction de l'URL
     base_url = "https://fr.indeed.com/emplois"
     url = f"{base_url}?q={query}"
 
-    print(f"Scraping: {url}\n")
+    print(f"Scraping avec Selenium: {url}\n")
 
-    # WebBaseLoader avec headers personnalises pour eviter le blocage
-    loader = WebBaseLoader(
-        web_paths=[url],
-        header_template={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
-    )
+    # Configuration Chrome en mode headless (sans interface)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
 
+    driver = None
     try:
-        # Charger les documents
-        docs = loader.load()
+        # Initialiser le driver Chrome
+        print("Initialisation du navigateur Chrome...")
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
-        print(f"Documents scraped: {len(docs)}")
+        # Charger la page
+        print("Chargement de la page Indeed...")
+        driver.get(url)
 
-        if len(docs) > 0:
-            print(f"\nFirst document preview:")
-            print(f"Length: {len(docs[0].page_content)} characters")
-            print(f"Content (first 500 chars):\n{docs[0].page_content[:500]}\n")
+        # Attendre que la page charge (JavaScript)
+        time.sleep(5)
 
-            # Extraire les details des offres avec BeautifulSoup
-            response = requests.get(url, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            })
-            soup = BeautifulSoup(response.content, 'html.parser')
+        # Recuperer le HTML
+        page_source = driver.page_source
+        soup = BeautifulSoup(page_source, 'html.parser')
 
-            # Trouver les cartes d'offres
-            jobs = soup.find_all('div', class_='job_seen_beacon')
-            print(f"\nJob cards found: {len(jobs)}")
+        # Extraire les offres
+        jobs = soup.find_all('div', class_='job_seen_beacon')
+        print(f"Offres trouvees: {len(jobs)}\n")
 
-            if len(jobs) > 0:
-                print("\nFirst 3 jobs extracted:")
-                for i, job in enumerate(jobs[:3]):
-                    title = job.find('h2', class_='jobTitle')
-                    company = job.find('span', class_='companyName')
-                    location = job.find('div', class_='companyLocation')
-                    salary = job.find('div', class_='salary-snippet')
-                    snippet = job.find('div', class_='job-snippet')
+        if len(jobs) > 0:
+            print("Premieres 3 offres:\n")
+            for i, job in enumerate(jobs[:3]):
+                # Extraire les details
+                title_elem = job.find('h2', class_='jobTitle')
+                company_elem = job.find('span', class_='companyName')
+                location_elem = job.find('div', class_='companyLocation')
+                salary_elem = job.find('div', class_='salary-snippet')
+                snippet_elem = job.find('div', class_='job-snippet')
 
-                    print(f"\nJob {i+1}:")
-                    print(f"  Title: {title.get_text(strip=True) if title else 'N/A'}")
-                    print(f"  Company: {company.get_text(strip=True) if company else 'N/A'}")
-                    print(f"  Location: {location.get_text(strip=True) if location else 'N/A'}")
-                    print(f"  Salary: {salary.get_text(strip=True) if salary else 'N/A'}")
-                    if snippet:
-                        print(f"  Snippet: {snippet.get_text(strip=True)[:100]}...")
+                # Extraire le lien
+                link_elem = job.find('a', class_='jcs-JobTitle')
+                job_link = f"https://fr.indeed.com{link_elem['href']}" if link_elem and 'href' in link_elem.attrs else 'N/A'
 
-                return len(jobs)
-            else:
-                print("WARNING: No job cards found - check HTML structure")
-                return 0
+                print(f"Offre {i+1}:")
+                print(f"  Titre: {title_elem.get_text(strip=True) if title_elem else 'N/A'}")
+                print(f"  Entreprise: {company_elem.get_text(strip=True) if company_elem else 'N/A'}")
+                print(f"  Lieu: {location_elem.get_text(strip=True) if location_elem else 'N/A'}")
+                print(f"  Salaire: {salary_elem.get_text(strip=True) if salary_elem else 'N/A'}")
+                print(f"  Lien: {job_link}")
+                if snippet_elem:
+                    print(f"  Description: {snippet_elem.get_text(strip=True)[:100]}...")
+                print()
+
+            return len(jobs)
         else:
-            print("ERROR: No documents loaded")
+            print("ATTENTION: Aucune offre trouvee")
+            print(f"Contenu de la page (500 premiers caracteres):\n{page_source[:500]}")
             return 0
 
     except Exception as e:
-        print(f"ERROR: {e}")
+        print(f"ERREUR: {e}")
         import traceback
         traceback.print_exc()
         return 0
+
+    finally:
+        # Fermer le navigateur
+        if driver:
+            print("Fermeture du navigateur...")
+            driver.quit()
 
 if __name__ == "__main__":
     # Test avec differentes requetes

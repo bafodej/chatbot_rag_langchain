@@ -5,9 +5,10 @@ langchain-community
 langchain-chroma
 langchain-text-splitters
 
-# Web scraping
+# Web scraping avec Selenium
 beautifulsoup4
-requests
+selenium
+webdriver-manager
 
 # Vector database
 chromadb
