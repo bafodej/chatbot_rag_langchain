@@ -1,7 +1,7 @@
 """
-Test script to validate Indeed scraping for job offers in France
-Supports multiple search terms: data analyst, python, IA, alternance, etc.
-Location filtering will be done by the chatbot in queries
+Script de test pour valider le scraping Indeed des offres d'emploi en France
+Supporte plusieurs termes de recherche : data analyst, python, IA, alternance, etc.
+Le filtrage par localisation sera effectue par le chatbot dans les requetes
 """
 from langchain_community.document_loaders import WebBaseLoader
 from bs4 import BeautifulSoup
@@ -9,19 +9,19 @@ import requests
 
 def test_scraping(query=""):
     """
-    Test scraping Indeed France job offers
+    Test du scraping des offres d'emploi Indeed France
 
     Args:
-        query: Search term (e.g., 'data analyst', 'python', 'alternance', or '' for all jobs)
+        query: Terme de recherche (ex: 'data analyst', 'python', 'alternance', ou '' pour toutes les offres)
     """
 
-    # Build URL - ALL FRANCE (no location filter)
+    # Construction de l'URL - TOUTE LA FRANCE (pas de filtre localisation)
     base_url = "https://fr.indeed.com/emplois"
     url = f"{base_url}?q={query}"
 
     print(f"Scraping: {url}\n")
 
-    # WebBaseLoader with custom headers to avoid blocking
+    # WebBaseLoader avec headers personnalises pour eviter le blocage
     loader = WebBaseLoader(
         web_paths=[url],
         header_template={
@@ -30,7 +30,7 @@ def test_scraping(query=""):
     )
 
     try:
-        # Load documents
+        # Charger les documents
         docs = loader.load()
 
         print(f"Documents scraped: {len(docs)}")
@@ -40,13 +40,13 @@ def test_scraping(query=""):
             print(f"Length: {len(docs[0].page_content)} characters")
             print(f"Content (first 500 chars):\n{docs[0].page_content[:500]}\n")
 
-            # Extract job details with BeautifulSoup
+            # Extraire les details des offres avec BeautifulSoup
             response = requests.get(url, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             })
             soup = BeautifulSoup(response.content, 'html.parser')
 
-            # Find job cards
+            # Trouver les cartes d'offres
             jobs = soup.find_all('div', class_='job_seen_beacon')
             print(f"\nJob cards found: {len(jobs)}")
 
@@ -82,18 +82,18 @@ def test_scraping(query=""):
         return 0
 
 if __name__ == "__main__":
-    # Test with different queries
+    # Test avec differentes requetes
     print("="*60)
-    print("TEST 1: Data Analyst jobs in France")
+    print("TEST 1: Offres Data Analyst en France")
     print("="*60)
     test_scraping("data analyst")
 
     print("\n" + "="*60)
-    print("TEST 2: Python developer jobs in France")
+    print("TEST 2: Offres developpeur Python en France")
     print("="*60)
     test_scraping("python")
 
     print("\n" + "="*60)
-    print("TEST 3: Alternance jobs in France")
+    print("TEST 3: Offres alternance en France")
     print("="*60)
     test_scraping("alternance")
