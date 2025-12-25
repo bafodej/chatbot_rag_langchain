@@ -1,10 +1,14 @@
 """
 Application Streamlit pour le chatbot RAG Indeed
-Utilise Ollama (100% gratuit, local)
+Utilise Selenium pour scraper Indeed et Ollama pour l'IA (100% gratuit, local)
 """
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_community.document_loaders import WebBaseLoader
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.llms import Ollama
 from langchain_community.embeddings import OllamaEmbeddings
@@ -12,6 +16,8 @@ from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_core.documents import Document
+import time
 
 # Charger les variables d'environnement
 load_dotenv()
@@ -60,19 +66,63 @@ if 'scraped' not in st.session_state:
     st.session_state.scraped = False
 
 def scrape_indeed(query=""):
-    """Scrappe les offres d'emploi Indeed France"""
+    """Scrappe les offres d'emploi Indeed France avec Selenium"""
     url = f"https://fr.indeed.com/emplois?q={query}"
 
-    with st.spinner(f"Scraping en cours : {url}"):
-        loader = WebBaseLoader(
-            web_paths=[url],
-            header_template={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            }
-        )
-        docs = loader.load()
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)")
 
-    return docs
+    driver = None
+    try:
+        with st.spinner("Initialisation du navigateur..."):
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+
+        with st.spinner(f"Scraping : {url}"):
+            driver.get(url)
+            time.sleep(5)
+
+        page_source = driver.page_source
+        soup = BeautifulSoup(page_source, 'html.parser')
+        jobs = soup.find_all('div', class_='job_seen_beacon')
+
+        docs = []
+        for job in jobs:
+            title_elem = job.find('h2', class_='jobTitle')
+            company_elem = job.find('span', class_='companyName')
+            location_elem = job.find('div', class_='companyLocation')
+            salary_elem = job.find('div', class_='salary-snippet')
+            snippet_elem = job.find('div', class_='job-snippet')
+            link_elem = job.find('a', class_='jcs-JobTitle')
+
+            title = title_elem.get_text(strip=True) if title_elem else "N/A"
+            company = company_elem.get_text(strip=True) if company_elem else "N/A"
+            location = location_elem.get_text(strip=True) if location_elem else "N/A"
+            salary = salary_elem.get_text(strip=True) if salary_elem else "Non specifie"
+            snippet = snippet_elem.get_text(strip=True) if snippet_elem else ""
+            job_link = f"https://fr.indeed.com{link_elem['href']}" if link_elem and 'href' in link_elem.attrs else ""
+
+            content = f"""Titre: {title}
+Entreprise: {company}
+Lieu: {location}
+Salaire: {salary}
+Description: {snippet}
+Lien: {job_link}"""
+
+            docs.append(Document(page_content=content, metadata={"source": url, "title": title, "link": job_link}))
+
+        return docs
+
+    except Exception as e:
+        st.error(f"Erreur de scraping: {e}")
+        return []
+
+    finally:
+        if driver:
+            driver.quit()
 
 def create_rag_chain(docs):
     """Cree la chaine RAG avec Ollama"""
