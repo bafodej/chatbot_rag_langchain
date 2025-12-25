@@ -1,0 +1,16 @@
+# Core dependencies (100% gratuit avec Ollama)
+streamlit
+langchain
+langchain-community
+langchain-chroma
+langchain-text-splitters
+
+# Web scraping
+beautifulsoup4
+requests
+
+# Vector database
+chromadb
+
+# Utilities
+python-dotenv
