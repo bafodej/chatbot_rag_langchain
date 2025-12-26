@@ -28,36 +28,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Chatbot RAG - Offres d'emploi Indeed France")
-st.markdown("Analysez les offres d'emploi Indeed en France avec Ollama (100% gratuit)")
-
-# Sidebar pour la configuration
-with st.sidebar:
-    st.header("Configuration")
-
-    # Requete de recherche
-    search_query = st.text_input(
-        "Terme de recherche Indeed",
-        value="data analyst",
-        help="Ex: 'data analyst', 'python', 'alternance', ou vide pour toutes les offres"
-    )
-
-    # Bouton pour scraper
-    scrape_button = st.button("Scraper Indeed", type="primary")
-
-    st.divider()
-
-    # Informations
-    st.markdown("### A propos")
-    st.markdown("""
-    Ce chatbot utilise :
-    - **LangChain** pour le RAG
-    - **ChromaDB** pour le stockage vectoriel
-    - **Ollama llama3.2** pour l'IA (gratuit, local)
-    - **Streamlit** pour l'interface
-    """)
-
-# Initialiser session state
+# Initialiser session state AVANT TOUT
 if 'vectorstore' not in st.session_state:
     st.session_state.vectorstore = None
 if 'rag_chain' not in st.session_state:
@@ -65,6 +36,7 @@ if 'rag_chain' not in st.session_state:
 if 'scraped' not in st.session_state:
     st.session_state.scraped = False
 
+# Fonctions
 def scrape_indeed(query=""):
     """Scrappe les offres d'emploi Indeed France avec Selenium"""
     url = f"https://fr.indeed.com/emplois?q={query}"
@@ -179,23 +151,56 @@ Reponse:"""
 
     return vectorstore, rag_chain, len(splits)
 
-# Scraping au clic du bouton
+# Scraping automatique au demarrage
+if not st.session_state.scraped:
+    with st.spinner("Preparation automatique - Scraping Data Analyst..."):
+        docs = scrape_indeed("data analyst")
+        if docs:
+            st.session_state.vectorstore, st.session_state.rag_chain, _ = create_rag_chain(docs)
+            st.session_state.scraped = True
+    st.rerun()
+
+# Interface utilisateur
+st.title("Chatbot RAG - Offres d'emploi Indeed France")
+st.success("Donnees chargees ! Posez vos questions")
+
+# Sidebar
+with st.sidebar:
+    st.header("Configuration")
+
+    # Requete de recherche
+    search_query = st.text_input(
+        "Terme de recherche Indeed",
+        value="data analyst",
+        help="Ex: 'data analyst', 'python', 'alternance'"
+    )
+
+    # Bouton pour re-scraper
+    scrape_button = st.button("Re-scraper Indeed", type="primary")
+
+    st.divider()
+
+    # Informations
+    st.markdown("### A propos")
+    st.markdown("""
+    Ce chatbot utilise :
+    - **LangChain** pour le RAG
+    - **ChromaDB** pour le stockage vectoriel
+    - **Ollama llama3.2** pour l'IA (gratuit, local)
+    - **Streamlit** pour l'interface
+    """)
+
+# Scraping manuel au clic du bouton
 if scrape_button:
     try:
-        # Scraping
         docs = scrape_indeed(search_query)
 
         if docs:
             st.success(f"{len(docs)} documents scrapes")
-
-            # Creation de la chaine RAG
             vectorstore, rag_chain, num_chunks = create_rag_chain(docs)
-
-            # Sauvegarder dans session state
             st.session_state.vectorstore = vectorstore
             st.session_state.rag_chain = rag_chain
             st.session_state.scraped = True
-
             st.success(f"RAG pret ! {num_chunks} chunks vectorises")
         else:
             st.error("Aucun document scrape")
@@ -208,18 +213,19 @@ st.divider()
 
 if st.session_state.scraped and st.session_state.rag_chain is not None:
     st.header("Posez vos questions")
-    
+
     # Exemples
     with st.expander("Exemples de questions"):
         st.markdown("""
         - Combien d'offres data analyst ?
-        - Quelles offres à Lille ?
+        - Quelles offres a Lille ?
         - Top 5 entreprises qui recrutent ?
+        - Quels sont les salaires proposes ?
         """)
-    
+
     # Input utilisateur
-    user_question = st.text_input("Votre question :", placeholder="Ex: Combien d'offres à Paris ?")
-    
+    user_question = st.text_input("Votre question :", placeholder="Ex: Combien d'offres a Paris ?")
+
     if user_question:
         try:
             with st.spinner("Recherche RAG en cours..."):
@@ -229,7 +235,7 @@ if st.session_state.scraped and st.session_state.rag_chain is not None:
         except Exception as e:
             st.error(f"Erreur RAG : {e}")
 else:
-    st.info("Cliquez 'Scraper Indeed' dans la sidebar d'abord")
+    st.info("Chargement en cours...")
 
 # Footer
 st.divider()
@@ -238,4 +244,3 @@ st.markdown("""
     Chatbot RAG Indeed - Powered by Ollama (100% gratuit)
 </div>
 """, unsafe_allow_html=True)
-
