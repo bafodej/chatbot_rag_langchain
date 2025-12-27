@@ -151,18 +151,12 @@ Reponse:"""
 
     return vectorstore, rag_chain, len(splits)
 
-# Scraping automatique au demarrage
-if not st.session_state.scraped:
-    with st.spinner("Preparation automatique - Scraping Data Analyst..."):
-        docs = scrape_indeed("data analyst")
-        if docs:
-            st.session_state.vectorstore, st.session_state.rag_chain, _ = create_rag_chain(docs)
-            st.session_state.scraped = True
-    st.rerun()
+# Note: Scraping automatique desactive pour ameliorer les performances
+# Utilisez le bouton dans la sidebar pour charger les donnees
 
 # Interface utilisateur
 st.title("Chatbot RAG - Offres d'emploi Indeed France")
-st.success("Donnees chargees ! Posez vos questions")
+st.markdown("Analysez les offres d'emploi Indeed en France avec Ollama")
 
 # Sidebar
 with st.sidebar:
@@ -175,8 +169,8 @@ with st.sidebar:
         help="Ex: 'data analyst', 'python', 'alternance'"
     )
 
-    # Bouton pour re-scraper
-    scrape_button = st.button("Re-scraper Indeed", type="primary")
+    # Bouton pour scraper
+    scrape_button = st.button("Scraper Indeed", type="primary")
 
     st.divider()
 
