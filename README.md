@@ -1,29 +1,40 @@
-# Chatbot RAG - Offres d'emploi France Travail
+# 🤖 Assistant Technique IA - Chatbot RAG
 
-Application de chatbot RAG (Retrieval-Augmented Generation) pour analyser les offres d'emploi officielles France Travail (ex-Pôle Emploi) en France.
+Assistant technique intelligent utilisant RAG (Retrieval-Augmented Generation) pour répondre à vos questions sur Python, Machine Learning, Deep Learning, Azure, LangChain, ChromaDB, Web Scraping et Data Analysis.
 
-## Caracteristiques
+## 🎯 Caracteristiques
 
-- **API France Travail** officielle et gratuite (remplace le scraping Indeed bloqué par Cloudflare)
-- **RAG Pipeline** avec LangChain et ChromaDB
+- **8 domaines techniques** : Python, LangChain, ChromaDB, Data Analysis, ML, DL, Azure, Web Scraping
+- **Documentation officielle** recuperee automatiquement depuis les sources officielles
+- **RAG Pipeline** avec LangChain et ChromaDB pour reponses precises
 - **IA locale gratuite** avec Ollama (llama3.2)
-- **Interface Streamlit** interactive
-- **Recherche flexible** : Alternance, Data Analyst, Python, Developpeur, etc.
-- **Filtre par departement** : Paris (75), Nord (59), Rhone (69), etc.
-- **Acces aux liens** pour postuler directement sur France Travail
+- **Interface interactive** avec Streamlit
+- **Recherche semantique** dans la documentation
+- **Exemples de code** dans les reponses
 - **100% gratuit** et open-source
 
-## Technologies
+## 🚀 Technologies
 
 - **Python 3.12**
-- **France Travail API** - API officielle offres d'emploi
 - **LangChain** - Framework RAG
 - **Ollama** - Modele IA local (gratuit)
 - **ChromaDB** - Base vectorielle
 - **Streamlit** - Interface utilisateur
+- **BeautifulSoup** - Parsing HTML
 - **Requests** - HTTP client
 
-## Installation
+## 📚 Topics disponibles
+
+1. **Python** - Tutoriels et librairie standard
+2. **LangChain** - Framework RAG et agents IA
+3. **ChromaDB** - Base de donnees vectorielle
+4. **Data Analysis** - Pandas, NumPy
+5. **Machine Learning** - scikit-learn
+6. **Deep Learning** - PyTorch, TensorFlow
+7. **Azure** - Cloud Microsoft, Azure ML
+8. **Web Scraping** - Requests, BeautifulSoup, Selenium
+
+## 🛠️ Installation
 
 ### 1. Cloner le repository
 
@@ -56,54 +67,15 @@ ollama pull llama3.2
 
 Pour les autres systemes : https://ollama.com/download
 
-### 5. Configurer l'API France Travail
+## 📖 Utilisation
 
-**IMPORTANT** : Vous devez obtenir des credentials API pour utiliser l'application.
-
-#### Etape par etape :
-
-1. **Creer un compte** sur https://francetravail.io
-
-2. **Creer une application** :
-   - Connectez-vous a votre espace partenaire
-   - Allez dans "Mes applications"
-   - Cliquez sur "Ajouter une application"
-   - Selectionnez l'API "Offres d'emploi v2"
-   - Remplissez les informations de votre application
-
-3. **Recuperer les credentials** :
-   - Une fois l'application creee, vous obtiendrez :
-     - `Client ID` (identifiant client)
-     - `Client Secret` (cle secrete)
-
-4. **Configurer le fichier .env** :
-   ```bash
-   cp .env.example .env
-   ```
-
-5. **Editer le fichier .env** et ajouter vos credentials :
-   ```
-   FRANCE_TRAVAIL_CLIENT_ID=votre_client_id_ici
-   FRANCE_TRAVAIL_CLIENT_SECRET=votre_client_secret_ici
-   ```
-
-## Utilisation
-
-### Tester l'API
+### Tester la recuperation de documentation
 
 ```bash
-python test_scraping.py
+python test_doc_fetch.py
 ```
 
-Cela va rechercher des offres pour 4 types de recherches (Data Analyst, Python, Alternance, Alternance a Paris) et afficher les resultats.
-
-### Lancer le notebook
-
-```bash
-jupyter notebook rag_chatbot.ipynb
-```
-
-Executez les cellules pour tester le pipeline RAG complet.
+Cela va tester la recuperation de documentation pour differents topics.
 
 ### Lancer l'application Streamlit
 
@@ -113,106 +85,158 @@ streamlit run app.py
 
 L'application s'ouvre sur http://localhost:8501
 
-**Dans l'interface** :
-1. Entrez votre terme de recherche (ex: "alternance", "python", "developpeur")
-2. (Optionnel) Entrez un code departement (ex: "75" pour Paris)
-3. Cliquez sur "Rechercher offres"
-4. Attendez que le RAG soit pret
-5. Posez vos questions dans le chat
+### Dans l'interface :
 
-## Fonctionnement
+1. **Selectionnez les topics** de documentation dans la sidebar (ex: python, machine_learning)
+2. **Choisissez le nombre de pages** par topic (1-5)
+3. **Cliquez sur "Charger Documentation"**
+4. **Attendez** que le RAG soit pret
+5. **Posez vos questions** dans le chat
 
-1. **API Call** : L'application interroge l'API France Travail avec vos criteres
-2. **Chunking** : Les offres sont decoupees en morceaux de 1000 caracteres
+## 💬 Exemples de questions
+
+### Python
+- Comment utiliser les decorateurs en Python ?
+- Quelle est la difference entre list et tuple ?
+- Comment gerer les exceptions en Python ?
+
+### Machine Learning
+- Comment preparer des donnees pour un modele ML ?
+- Explique-moi le RandomForest
+- Comment faire de la validation croisee ?
+
+### Deep Learning
+- Comment creer un reseau de neurones avec PyTorch ?
+- Qu'est-ce que le backpropagation ?
+- Comment eviter l'overfitting ?
+
+### LangChain
+- Comment creer une chaine RAG avec LangChain ?
+- Qu'est-ce qu'un retriever ?
+- Comment utiliser les agents LangChain ?
+
+### Azure
+- Comment deployer un modele ML sur Azure ?
+- Qu'est-ce qu'Azure Machine Learning ?
+- Comment utiliser Azure pour le traitement de donnees ?
+
+### Data Analysis
+- Comment utiliser Pandas pour analyser des donnees ?
+- Comment visualiser des donnees avec Matplotlib ?
+- Comment nettoyer des donnees manquantes ?
+
+### Web Scraping
+- Comment scraper un site web avec BeautifulSoup ?
+- Quelle est la difference entre Requests et Selenium ?
+- Comment respecter robots.txt ?
+
+### ChromaDB
+- Comment creer une collection dans ChromaDB ?
+- Comment faire une recherche semantique ?
+- Comment persister les donnees ?
+
+## 🔧 Fonctionnement technique
+
+1. **Recuperation** : WebBaseLoader recupere la documentation depuis les sources officielles
+2. **Chunking** : Les documents sont decoupes en morceaux de 1500 caracteres (overlap 300)
 3. **Vectorisation** : Ollama cree des embeddings pour chaque chunk
 4. **Stockage** : ChromaDB sauvegarde les vecteurs localement
 5. **Requete** : L'utilisateur pose une question
-6. **Recherche** : ChromaDB trouve les chunks pertinents
+6. **Recherche** : ChromaDB trouve les 8 chunks les plus pertinents
 7. **Reponse** : Ollama genere une reponse basee sur le contexte
 
-## Exemples de questions
-
-- "Combien d'offres d'alternance ?"
-- "Quelles offres a Paris ?"
-- "Top 5 entreprises qui recrutent ?"
-- "Quels sont les salaires proposes ?"
-- "Quels types de contrats sont proposes ?"
-- "Quelles competences sont demandees ?"
-
-## Structure du projet
+## 📁 Structure du projet
 
 ```
 chatbot/
 ├── app.py                      # Application Streamlit
-├── france_travail_api.py       # Module API France Travail
+├── doc_fetcher.py              # Module recuperation documentation
+├── test_doc_fetch.py           # Script de test
 ├── rag_chatbot.ipynb           # Notebook de test
-├── test_scraping.py            # Script de test API
 ├── requirements.txt            # Dependances Python
-├── .env.example                # Template configuration
-├── .env                        # Configuration (a creer avec vos credentials)
+├── .env                        # Configuration (optionnel)
 ├── .gitignore                  # Fichiers ignores par Git
 ├── chroma_db/                  # Base vectorielle (generee)
 └── venv/                       # Environnement virtuel (ignore)
 ```
 
-## Codes departement France
+## 🌐 Sources de documentation
 
-Quelques exemples de codes departement :
-- **75** : Paris
-- **59** : Nord (Lille)
-- **69** : Rhone (Lyon)
-- **13** : Bouches-du-Rhone (Marseille)
-- **31** : Haute-Garonne (Toulouse)
-- **33** : Gironde (Bordeaux)
-- **44** : Loire-Atlantique (Nantes)
-- **67** : Bas-Rhin (Strasbourg)
+| Topic | Sources officielles |
+|-------|-------------------|
+| **Python** | https://docs.python.org |
+| **LangChain** | https://python.langchain.com/docs |
+| **ChromaDB** | https://docs.trychroma.com |
+| **Data Analysis** | https://pandas.pydata.org, https://numpy.org |
+| **ML** | https://scikit-learn.org |
+| **DL** | https://pytorch.org, https://tensorflow.org |
+| **Azure** | https://learn.microsoft.com/azure |
+| **Scraping** | https://docs.python-requests.org, https://beautiful-soup-4.readthedocs.io |
 
-Liste complete : https://www.data.gouv.fr/fr/datasets/departements-de-france/
+## ⚙️ Configuration avancee
 
-## Avantages vs Indeed
+### Personnaliser les sources
 
-| Critere | France Travail API | Indeed (scraping) |
-|---------|-------------------|-------------------|
-| **Gratuit** | ✅ Oui | ✅ Oui |
-| **Legal** | ✅ API officielle | ⚠️ Scraping = zone grise |
-| **Fiable** | ✅ Stable | ❌ Bloque par Cloudflare |
-| **Donnees** | ✅ Completes | ⚠️ Limitees |
-| **Maintenance** | ✅ Aucune | ❌ Casse regulierement |
-| **Rapidite** | ✅ Rapide (API) | ❌ Lent (Selenium) |
-| **Offres alternance** | ✅ Excellent | ⚠️ Variable |
+Editez `doc_fetcher.py` pour ajouter/modifier les URLs de documentation :
 
-## Limitations
+```python
+self.documentation_sources = {
+    "python": [
+        "https://docs.python.org/3/tutorial/index.html",
+        # Ajoutez vos URLs ici
+    ],
+}
+```
 
-- **Limite API** : 10 requetes/seconde (largement suffisant)
-- **Max resultats** : 150 offres par requete API
-- **Modele local** : Reponses parfois moins precises que GPT-4
-- **Credentials requis** : Necessite creation compte France Travail
+### Modifier le modele Ollama
 
-## Contribution
+Dans `app.py`, ligne 87 :
+
+```python
+llm = Ollama(model="llama3.2", temperature=0.3)
+# Changez pour: "llama3", "mistral", "codellama", etc.
+```
+
+### Ajuster les parametres RAG
+
+- **Chunk size** : ligne 52 de `app.py` (default: 1500)
+- **Chunk overlap** : ligne 53 de `app.py` (default: 300)
+- **Nombre de chunks** : ligne 88 de `app.py` (default: k=8)
+- **Temperature** : ligne 87 de `app.py` (default: 0.3)
+
+## 🚧 Limitations
+
+- **Temps de chargement** : La recuperation de documentation peut prendre 1-2 minutes
+- **Qualite des reponses** : Depend de la documentation recuperee
+- **Modele local** : Moins precis que GPT-4 mais 100% gratuit
+- **Connexion internet** : Necessaire pour recuperer la documentation
+
+## 🔄 Evolution du projet
+
+Ce projet a evolue :
+1. **v1** : Scraping Indeed (bloque par Cloudflare)
+2. **v2** : API France Travail pour offres d'emploi
+3. **v3** : Assistant technique avec documentation IA/ML/Azure
+
+## 🤝 Contribution
 
 Ameliorations possibles :
-- [ ] Support multi-pages API (pagination)
-- [ ] Cache des resultats
-- [ ] Export CSV des offres
-- [ ] Filtres avances (salaire, contrat, experience)
-- [ ] Integration d'autres APIs (Adzuna, etc.)
-- [ ] Mode hors-ligne avec cache
+- [ ] Cache de la documentation
+- [ ] Support de plus de technologies (React, Django, etc.)
+- [ ] Export des conversations
+- [ ] Historique des questions
+- [ ] Mode hors-ligne avec doc pre-telechargee
+- [ ] Support PDF/Markdown locaux
+- [ ] Multi-langues (anglais/francais)
 
-## Ressources
-
-- **API France Travail** : https://francetravail.io
-- **Documentation API** : https://francetravail.io/data/api/offres-emploi
-- **Ollama** : https://ollama.com
-- **LangChain** : https://langchain.com
-
-## Licence
+## 📄 Licence
 
 Projet educatif - Libre d'utilisation
 
-## Auteur
+## 👨‍💻 Auteur
 
 Bafode Jaiteh - https://github.com/bafodej
 
 ---
 
-**Note** : Ce projet utilisait initialement le scraping Indeed avec Selenium, mais Indeed a bloque l'acces avec Cloudflare. L'API France Travail est une solution 100% legale, gratuite et plus fiable.
+**Note** : Parfait pour apprendre Python, ML, DL, Azure et technologies de donnees avec un assistant IA local et gratuit !
